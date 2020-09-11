@@ -1,3 +1,4 @@
+
 /*
  * Write a function WITH NO CALLBACKS that,
  * (1) reads a GitHub username from a `readFilePath`
@@ -9,15 +10,21 @@
  */
 
 var fs = require('fs');
-var Promise = require('bluebird');
 
+var Promise = require('bluebird');
+var writeFileAsync = Promise.promisify(fs.writeFile);
+var getGitHubProfileAsync = require('./promisification').getGitHubProfileAsync;
+var pluckFirstLineFromFileAsync = require('./promiseConstructor').pluckFirstLineFromFileAsync;
 
 
 var fetchProfileAndWriteToFile = function(readFilePath, writeFilePath) {
-  // TODO
+  //read first line of file-- parse out username?
+  return pluckFirstLineFromFileAsync(readFilePath)
+    .then(getGitHubProfileAsync) //no argument required bc it is written into the resolve of previous function/promise
+    .then (function (profile) {
+      return writeFileAsync(writeFilePath, JSON.stringify(profile)); //remember what you are doing! write file needs a location to save file AND file AND sometimes what encoding it is in-- ie 'utf8'
+    });
 };
-
-// Export these functions so we can test them
 module.exports = {
   fetchProfileAndWriteToFile: fetchProfileAndWriteToFile
 };
